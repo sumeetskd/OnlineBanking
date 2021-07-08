@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+        
+        <tx:annotation-driven/>
+        <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        	<property name="sessionFactory" ref="sessionFactory"></property>
+        </bean>
+        
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        	<property name="driverClassName" value="${db.driver}"></property>
+        	<property name="url" value="${db.url}"></property>
+        	<property name="username" value="${db.username}"></property>
+        	<property name="password" value="${db.password}"></property>
+        </bean>
+        
+        <bean class=" org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        	<property name="locations">
+        		<list>
+        			<value>com/tan/su/resources/mysql.properties</value>
+        		</list>
+        	</property>
+        </bean>
+        
+        <bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+        	<property name="sessionFactory" ref="sessionFactory"></property>
+        	<property name="checkWriteOperations" value="false"></property>
+        </bean>
+        
+        <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        	<property name="dataSource" ref="dataSource"></property>
+        	<property name="annotatedClasses">
+        		<array>
+        			<value>com.tan.su.beans.SignUpCls</value>
+        			<value>com.tan.su.beans.OpenAccount</value>
+        		</array>
+        	</property>
+        	<property name="hibernateProperties">
+        		<props>
+        			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+        			<prop key="hibernate.hbm2ddl.auto">create</prop>
+        			<prop key="show_sql">true</prop>
+        			<prop key="format_sql">true</prop>
+        		</props>
+        	</property>
+        </bean>
+        <bean id="signUpBo" class="com.tan.su.bo.SignUpBusinessImpl">
+        	<property name="signUpDao" ref="signUpDao"></property>
+        </bean>
+        
+        <bean id="signUpDao" class="com.tan.su.dao.SignUpClsDaoImpl">
+        	<property name="hibernateTemplate" ref="hibernateTemplate"></property>
+        </bean>
+        
+        <bean id="openAccountDao" class="com.tan.su.dao.OpenAccountDaoImpl">
+        	<property name="hibernateTemplate" ref="hibernateTemplate"></property>
+        </bean>
+        <bean id="openAccountBo" class="com.tan.su.bo.OpenAccountBusinessImpl">
+        	<property name="dao" ref="openAccountDao"></property>
+        </bean>
+ </beans>
